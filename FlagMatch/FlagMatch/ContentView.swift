@@ -52,11 +52,7 @@ struct ContentView: View {
                         Button(action: {
                             self.flagTapped(number)
                         }) {
-                            Image(self.countries[number])
-                                .renderingMode(.original)
-                                .clipShape(Capsule())
-                                .overlay(Capsule().stroke(Color.black, lineWidth: 1))
-                                .shadow(color: .black, radius: 2)
+                            FlagImage(imageFileName: self.countries[number])
                         }
                     }
                     
@@ -65,7 +61,7 @@ struct ContentView: View {
                     Text("Score: \(score) / \(numberOfQuestions) (\(percentCorrect, specifier: "%.0f")%)")
                         .font(.largeTitle)
                         .foregroundColor(Color.white)
-                               
+                    
                     Spacer()
                     
                     Button(action: {
@@ -74,19 +70,9 @@ struct ContentView: View {
                         self.askQuestions()
                     }) {
                         Text("Reset score")
-                            .font(.body)
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(40)
-                            .foregroundColor(Color.black)
-                            .padding(10)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 40)
-                                    .stroke(Color.white, lineWidth: 5))
+                            .buttonText()
                     }
-                    
                     Spacer()
-
                 }
             }
                 
@@ -103,25 +89,58 @@ struct ContentView: View {
             scoreTitle = "Correct"
             message = "Good job!"
             score += 1
-            numberOfQuestions += 1
         } else {
             scoreTitle = "Incorrect"
             message = "That is the flag of \(countries[number])"
-            numberOfQuestions += 1
         }
-        
+        numberOfQuestions += 1
         showScore = true
     }
     
+    // Refresh question
     func askQuestions() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
     }
-    
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+    }
+}
+
+// Format and create flag views
+struct FlagImage: View {
+    var imageFileName: String
+    
+    var body: some View {
+        Image(imageFileName)
+            .renderingMode(.original)
+            .clipShape(Capsule())
+            .overlay(Capsule().stroke(Color.black, lineWidth: 1))
+            .shadow(color: .black, radius: 2)
+    }
+}
+
+// Button text formatting
+struct ButtonText: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.body)
+            .padding()
+            .background(Color.white)
+            .cornerRadius(40)
+            .foregroundColor(Color.black)
+            .padding(10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 40)
+                    .stroke(Color.white, lineWidth: 5))
+    }
+}
+
+extension View {
+    func buttonText() -> some View {
+        self.modifier(ButtonText())
     }
 }
